@@ -60,6 +60,14 @@ namespace Server.Controllers
             // For simplicity, let's return a success message
             return Ok(user);
         }
+
+        // Login user
+        [HttpGet("user")]
+        public async Task<IActionResult> getUser(int id)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+            return Ok(user);
+        }
     }
 
     // DTO to capture the user input for registration and login

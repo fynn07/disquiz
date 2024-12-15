@@ -89,7 +89,34 @@ namespace Server.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+        
+        [HttpGet("getQuizzesByAuthor")]
+        public async Task<IActionResult> GetQuizzesByAuthor(int authorId)
+        {
+            try
+            {
+                // Fetch quizzes that match the author ID
+                var quizzes = await _context.Quizzes
+                    .Where(q => q.QuizAuthorId == authorId)
+                    .Include(q => q.QuizQuestions)
+                    .ToListAsync();
+
+                // If no quizzes found, return NotFound
+                if (quizzes == null || !quizzes.Any())
+                {
+                    return NotFound("No quizzes found for the specified author.");
+                }
+
+                return Ok(quizzes);
+            }
+            catch (Exception ex)
+            {
+                // Return internal server error if any exception occurs
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
     }
+    
 
     // DTO for receiving quiz data from the client
     public class QuizDto

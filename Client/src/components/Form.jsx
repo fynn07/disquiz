@@ -22,6 +22,8 @@ const Form = () => {
       // If login is successful, navigate to the homepage with the selected tab state
       if (data) {
         toast.success("Logged In Successfully!");
+        localStorage.setItem("userID", data.id)
+        console.log(data)
         navigate('/homepage', { state: { selectedTab: 'dashboard' } });
       }
     } catch (error) {

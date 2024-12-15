@@ -65,9 +65,59 @@ export const loginUser = async(email, password) => {
     }
 }
 
+export const getUser = async (id) => {
+    try {
+      const response = await fetch(`${ENDPOINT}api/auth/user?id=${id}`, {
+        method: 'GET',  // Change to GET as we are passing data in the URL
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      if (!response.ok) {
+        toast.error("Error Fetching user");
+        return { error: "error" };
+      }
+  
+      const data = await response.json();
+      return data;
+  
+    } catch (error) {
+      console.error("There was an error", error);
+      toast.error("An error occurred while getting user.");
+      throw error;
+    }
+  };
+
 export const getQuizzes = async() => {
     try {
         const response = await fetch(`${ENDPOINT}api/quiz/getAllQuizzes`, {
+            method: 'GET',
+            headers: {
+                'Content-Type' : 'application/json'
+            },
+        });        
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            toast.error("Error Fetching Quizzes");
+            return {error: "error"};
+        }
+
+        return data;
+        
+    } catch (error) {
+        console.error("There was an error", error);
+        toast.error("An error occurred while registering.");
+        throw error;     
+    }
+
+}
+
+export const getQuizzesByAuthor = async(id) => {
+    try {
+        const response = await fetch(`${ENDPOINT}api/quiz/getQuizzesByAuthor?authorId=${id}`, {
             method: 'GET',
             headers: {
                 'Content-Type' : 'application/json'
@@ -101,7 +151,7 @@ export const postQuiz = async(title, description, questions) => {
             body: JSON.stringify({
                 quizName: title,
                 quizDescription: description,
-                quizAuthorId: 1,
+                quizAuthorId: parseInt(localStorage.getItem("userID"), 10),
                 quizQuestions: questions,
             })
         });        

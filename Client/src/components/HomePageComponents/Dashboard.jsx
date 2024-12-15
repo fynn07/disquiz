@@ -1,10 +1,33 @@
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
-import { getQuizzes } from "../../services/api";
+import { getQuizzes, getUser } from "../../services/api";
 import { toast } from 'react-hot-toast';
 
-const Cards = ({ title, description, bgColor, onClick }) => {
+const Cards = ({ title, description, bgColor, author, onClick }) => {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+
+  useEffect(() => {
+    const fetchName = async () => {
+      try {
+        const data = await getUser(author);
+        if (data.error) {
+          toast.error("Failed to fetch User.");
+        } else {
+          console.log(data)
+          setFirstName(data.firstName);
+          setLastName(data.lastName);
+        }
+      } catch (error) {
+        console.error("Error fetching names:", error);
+        toast.error("An error occurred while fetching quizzes.");
+      } 
+    };
+
+    fetchName();
+  }, [author]);
+
   return (
     <div
       className={`group relative flex flex-col justify-between items-center p-4 ${bgColor} shadow-lg rounded-lg transform transition-transform duration-300 hover:scale-105 cursor-pointer`}
@@ -14,7 +37,7 @@ const Cards = ({ title, description, bgColor, onClick }) => {
       <p className=" mb-4 font-bold">True or False</p>
       <p className=" mb-4 border-2 text-center p-4">{description}</p>
       <p className="">Created By:</p>
-      <p className="font-bold">Fynn Borja</p>
+      <p className="font-bold">{firstName} {lastName}</p>
     </div>
   );
 };
@@ -22,6 +45,7 @@ const Cards = ({ title, description, bgColor, onClick }) => {
 Cards.propTypes = {
   title: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
+  author: PropTypes.number.isRequired,
   bgColor: PropTypes.string.isRequired,
   onClick: PropTypes.func.isRequired,
 };
@@ -72,6 +96,7 @@ const Dashboard = () => {
             title={quiz.quizName}
             description={quiz.quizDescription}
             bgColor={colors[index % colors.length]} // Assign dynamic colors based on the index
+            author={quiz.quizAuthorId}
             onClick={() => handleCardClick(`/tf-quiz`, quiz.quizQuestions)}
           />
         ))}
